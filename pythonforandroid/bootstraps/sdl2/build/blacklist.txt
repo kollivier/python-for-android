@@ -5,9 +5,6 @@
 # eggs
 *.egg-info
 
-# unit test
-unittest/*
-
 # python config
 config/makesetup
 
