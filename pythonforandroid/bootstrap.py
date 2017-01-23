@@ -147,7 +147,7 @@ class Bootstrap(object):
     @classmethod
     def list_bootstraps(cls):
         '''Find all the available bootstraps and return them.'''
-        forbidden_dirs = ('__pycache__', )
+        forbidden_dirs = ('__pycache__', 'common')
         bootstraps_dir = join(dirname(__file__), 'bootstraps')
         for name in listdir(bootstraps_dir):
             if name in forbidden_dirs:
