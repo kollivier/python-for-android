@@ -141,10 +141,13 @@ def require_prebuilt_dist(func):
                                       user_android_api=self.android_api,
                                       user_ndk_ver=self.ndk_version)
         dist = self._dist
+        bs = Bootstrap.get_bootstrap(args.bootstrap, ctx)
+        # recipes rarely change, but during dev, bootstraps can change from
+        # build to build, so run prepare_bootstrap even if needs_build is false
         if dist.needs_build:
             info_notify('No dist exists that meets your requirements, '
                         'so one will be built.')
-            build_dist_from_args(ctx, dist, args)
+        build_dist_from_args(ctx, dist, args)
         func(self, args)
     return wrapper_func
 
@@ -185,15 +188,16 @@ def build_dist_from_args(ctx, dist, args):
 
     ctx.dist_name = bs.distribution.name
     ctx.prepare_bootstrap(bs)
-    ctx.prepare_dist(ctx.dist_name)
+    if dist.needs_build:
+        ctx.prepare_dist(ctx.dist_name)
 
-    build_recipes(build_order, python_modules, ctx)
+        build_recipes(build_order, python_modules, ctx)
 
-    ctx.bootstrap.run_distribute()
+        ctx.bootstrap.run_distribute()
 
-    info_main('# Your distribution was created successfully, exiting.')
-    info('Dist can be found at (for now) {}'
-         .format(join(ctx.dist_dir, ctx.dist_name)))
+        info_main('# Your distribution was created successfully, exiting.')
+        info('Dist can be found at (for now) {}'
+             .format(join(ctx.dist_dir, ctx.dist_name)))
 
 
 def split_argument_list(l):
