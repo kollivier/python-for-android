@@ -4,9 +4,11 @@ import os
 library_dirs = ['libs/' + os.environ['ARCH']]
 lib_dict = {
     'pygame': ['sdl'],
-    'sdl2': ['SDL2', 'SDL2_image', 'SDL2_mixer', 'SDL2_ttf']
+    'sdl2': ['SDL2', 'SDL2_image', 'SDL2_mixer', 'SDL2_ttf'],
 }
-sdl_libs = lib_dict[os.environ['BOOTSTRAP']]
+sdl_libs = []
+if os.environ['BOOTSTRAP'] in lib_dict:
+    sdl_libs = lib_dict[os.environ['BOOTSTRAP']]
 
 renpy_sound = Extension('android._android_sound',
                         ['android/_android_sound.c', 'android/_android_sound_jni.c', ],
