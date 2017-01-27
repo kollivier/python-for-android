@@ -251,18 +251,28 @@ main.py that loads it.''')
     if exists('crystax_python'):
         tar_dirs.append('crystax_python')
 
+    ignore_path = args.ignore_path
+    # Assets dir will be packaged separately
+    if args.assets_dir:
+        ignore_path.append(args.assets_dir)
+
     if args.private:
-        make_tar('assets/private.mp3', tar_dirs, args.ignore_path)
+        make_tar('assets/private.mp3', tar_dirs, ignore_path)
     elif args.launcher:
         # clean 'None's as a result of main.py path absence
         tar_dirs = [tdir for tdir in tar_dirs if tdir]
-        make_tar('assets/private.mp3', tar_dirs, args.ignore_path)
+        make_tar('assets/private.mp3', tar_dirs, ignore_path)
     # else:
     #     make_tar('assets/private.mp3', ['private'])
 
     # if args.dir:
     #     make_tar('assets/public.mp3', [args.dir], args.ignore_path)
-
+    if args.assets_dir:
+        basename = os.path.basename(args.assets_dir)
+        dest_dir = os.path.join('assets', basename)
+        if exists(dest_dir):
+            shutil.rmtree(dest_dir)
+        shutil.copytree(args.assets_dir, dest_dir)
 
     # # Build.
     # try:
@@ -411,6 +421,9 @@ tools directory of the Android SDK.
                     help='the dir of user files')
                     # , required=True) for launcher, crashes in make_package
                     # if not mentioned (and the check is there anyway)
+    ap.add_argument('--assets-dir', dest='assets_dir',
+                    help='Directory of files to be included unpacked in the APK (e.g. media files)',
+                    required=False)
     ap.add_argument('--package', dest='package',
                     help=('The name of the java package the project will be'
                           ' packaged under.'),

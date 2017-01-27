@@ -231,6 +231,10 @@ def make_package(args):
 
     # Package up the private and public data.
     # AND: Just private for now
+    ignore_path = args.ignore_path
+    # Assets dir will be packaged separately
+    if args.assets_dir:
+        ignore_path.append(args.assets_dir)
     tar_dirs = [args.private]
     if exists('private'):
         tar_dirs.append('private')
@@ -238,7 +242,14 @@ def make_package(args):
         tar_dirs.append('crystax_python')
     tar_dirs.append('webview_includes')
     if args.private:
-        make_tar('assets/private.mp3', tar_dirs, args.ignore_path)
+        make_tar('assets/private.mp3', tar_dirs, ignore_path)
+
+    if args.assets_dir:
+        basename = os.path.basename(args.assets_dir)
+        dest_dir = os.path.join('assets', basename)
+        if exists(dest_dir):
+            shutil.rmtree(dest_dir)
+        shutil.copytree(args.assets_dir, dest_dir)
     # else:
     #     make_tar('assets/private.mp3', ['private'])
 
@@ -380,6 +391,9 @@ tools directory of the Android SDK.
     ap.add_argument('--private', dest='private',
                     help='the dir of user files',
                     required=True)
+    ap.add_argument('--assets-dir', dest='assets_dir',
+                    help='Directory of files to be included unpacked in the APK (e.g. media files)',
+                    required=False)
     ap.add_argument('--package', dest='package',
                     help=('The name of the java package the project will be'
                           ' packaged under.'),
