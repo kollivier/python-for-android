@@ -308,6 +308,19 @@ public class PythonActivity extends Activity {
         return   mLayout;
     }
 
+    long lastBackClick = SystemClock.elapsedRealtime();
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        // Check if the key event was the Back button and if there's history
+        if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {
+            mWebView.goBack();
+            return true;
+        }
+        // If it wasn't the Back key or there's no web page history, bubble up to the default
+        // system behavior (the back key will hence exit the activity)
+        return super.onKeyDown(keyCode, event);
+    }
+
     @Override
     protected void onPause() {
         Log.v(TAG, "onPause()");
@@ -318,8 +331,8 @@ public class PythonActivity extends Activity {
         }
 
         if (mWebView != null) {
+            mWebView.loadUrl("javascript:onAndroidPause()", null);
             mWebView.onPause();
-            mWebView.pauseTimers();
         }
     }
 
@@ -333,8 +346,8 @@ public class PythonActivity extends Activity {
         }
 
         if (mWebView != null) {
+            mWebView.loadUrl("javascript:onAndroidResume()", null);
             mWebView.onResume();
-            mWebView.resumeTimers();
         }
     }
 
