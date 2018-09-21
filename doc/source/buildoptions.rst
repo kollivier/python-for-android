@@ -42,7 +42,7 @@ Google's official NDK which includes many improvements. You
 python3. You can get it `here
 <https://www.crystax.net/en/download>`__.
 
-The python3crystax build is is handled quite differently to python2 so
+The python3crystax build is handled quite differently to python2 so
 there may be bugs or surprising behaviours. If you come across any,
 feel free to `open an issue
 <https://github.com/kivy/python-for-android>`__.
@@ -56,7 +56,7 @@ python-for-android supports multiple app backends with different types
 of interface. These are called *bootstraps*.
 
 Currently the following bootstraps are supported, but we hope that it
-it should be easy to add others if your project has different
+should be easy to add others if your project has different
 requirements. `Let us know
 <https://groups.google.com/forum/#!forum/python-android>`__ if you'd
 like help adding a new one.
@@ -95,7 +95,7 @@ options (this list may not be exhaustive):
   ``android:screenOrientation`` in the `Android documentation
   <https://developer.android.com/guide/topics/manifest/activity-element.html>`__.
 - ``--icon``: A path to the png file to use as the application icon.
-- ``-- permission``: A permission name for the app,
+- ``--permission``: A permission name for the app,
   e.g. ``--permission VIBRATE``. For multiple permissions, add
   multiple ``--permission`` arguments.
 - ``--meta-data``: Custom key=value pairs to add in the application metadata.
