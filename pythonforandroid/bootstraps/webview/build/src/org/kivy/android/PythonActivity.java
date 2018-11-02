@@ -87,102 +87,119 @@ public class PythonActivity extends Activity {
         Log.v(TAG, "My oncreate running");
         resourceManager = new ResourceManager(this);
 
-        this.mActivity = this;
-
-        Log.v("Python", "Device: " + android.os.Build.DEVICE);
-        Log.v("Python", "Model: " + android.os.Build.MODEL);
         super.onCreate(savedInstanceState);
 
-        // onCreate and onDestroy are actually called each time the app 
-        // is paused and resumed. This is why the variables are sometimes
-        // already initialized - because the app just paused and is about
-        // to restore. So only run initialization when we are not restoring.  
-
-        Log.v(TAG, "Ready to unpack");
-        unpackData("private", getFilesDir());
-        PythonActivity.initialize();
-
-        // Load shared libraries
-        String errorMsgBrokenLib = "";
-        try {
-            loadLibraries();
-        } catch(UnsatisfiedLinkError e) {
-            System.err.println(e.getMessage());
-            mBrokenLibraries = true;
-            errorMsgBrokenLib = e.getMessage();
-        } catch(Exception e) {
-            System.err.println(e.getMessage());
-            mBrokenLibraries = true;
-            errorMsgBrokenLib = e.getMessage();
-        }
-
-        if (mBrokenLibraries)
-        {
-            AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
-            dlgAlert.setMessage("An error occurred while trying to load the application libraries. Please try again and/or reinstall."
-                  + System.getProperty("line.separator")
-                  + System.getProperty("line.separator")
-                  + "Error: " + errorMsgBrokenLib);
-            dlgAlert.setTitle("Python Error");
-            dlgAlert.setPositiveButton("Exit",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog,int id) {
-                        // if this button is clicked, close current activity
-                        PythonActivity.mActivity.finish();
-                    }
-                });
-           dlgAlert.setCancelable(false);
-           dlgAlert.create().show();
-
-           return;
-        }
-
-        if (mWebView == null) {
-            Log.v(TAG, "mWebView is null");
-        } else {
-            Log.v(TAG, "mWebView is not null");
-        }
-
-        // Set up the webview
-        mWebView = new WebView(this);
-        mWebView.setId(mWebView.generateViewId());  // used to ensure the control persists
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.getSettings().setDomStorageEnabled(true);
-        mWebView.setBackgroundColor(Color.BLACK);
-
-        mWebView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-
-        mLayout = new AbsoluteLayout(this);
-        mLayout.addView(mWebView);
-
-        setContentView(mLayout);
+        this.mActivity = this;
         this.showLoadingScreen();
+        new UnpackFilesTask().execute(getFilesDir());
+    }
 
-        String mFilesDirectory = mActivity.getFilesDir().getAbsolutePath();
-        Log.v(TAG, "Setting env vars for start.c and Python to use");
-        PythonActivity.nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
-        PythonActivity.nativeSetEnv("ANDROID_ARGUMENT", mFilesDirectory);
-        PythonActivity.nativeSetEnv("ANDROID_APP_PATH", mFilesDirectory);
-        PythonActivity.nativeSetEnv("ANDROID_ENTRYPOINT", "main.pyo");
-        PythonActivity.nativeSetEnv("PYTHONHOME", mFilesDirectory);
-        PythonActivity.nativeSetEnv("PYTHONPATH", mFilesDirectory + ":" + mFilesDirectory + "/lib");
 
-        try {
-            Log.v(TAG, "Access to our meta-data...");
-            this.mMetaData = this.mActivity.getPackageManager().getApplicationInfo(
-                    this.mActivity.getPackageName(), PackageManager.GET_META_DATA).metaData;
-
-            PowerManager pm = (PowerManager) this.mActivity.getSystemService(Context.POWER_SERVICE);
-            if ( this.mMetaData.getInt("wakelock") == 1 ) {
-                this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Screen On");
-            }
-        } catch (PackageManager.NameNotFoundException e) {
+    private class UnpackFilesTask extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+            File app_root_file = new File(params[0]);
+            Log.v(TAG, "Ready to unpack");
+            unpackData("private", app_root_file);
+            return null;
         }
 
-        final Thread pythonThread = new Thread(new PythonMain(), "PythonThread");
-        PythonActivity.mPythonThread = pythonThread;
-        pythonThread.start();
+        @Override
+        protected void onPostExecute(String result) {
+            Log.v("Python", "Device: " + android.os.Build.DEVICE);
+            Log.v("Python", "Model: " + android.os.Build.MODEL);
+
+            // onCreate and onDestroy are actually called each time the app
+            // is paused and resumed. This is why the variables are sometimes
+            // already initialized - because the app just paused and is about
+            // to restore. So only run initialization when we are not restoring.
+
+            Log.v(TAG, "Ready to unpack");
+            PythonActivity.initialize();
+
+            // Load shared libraries
+            String errorMsgBrokenLib = "";
+            try {
+                loadLibraries();
+            } catch(UnsatisfiedLinkError e) {
+                System.err.println(e.getMessage());
+                mBrokenLibraries = true;
+                errorMsgBrokenLib = e.getMessage();
+            } catch(Exception e) {
+                System.err.println(e.getMessage());
+                mBrokenLibraries = true;
+                errorMsgBrokenLib = e.getMessage();
+            }
+
+            if (mBrokenLibraries)
+            {
+                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+                dlgAlert.setMessage("An error occurred while trying to load the application libraries. Please try again and/or reinstall."
+                      + System.getProperty("line.separator")
+                      + System.getProperty("line.separator")
+                      + "Error: " + errorMsgBrokenLib);
+                dlgAlert.setTitle("Python Error");
+                dlgAlert.setPositiveButton("Exit",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog,int id) {
+                            // if this button is clicked, close current activity
+                            PythonActivity.mActivity.finish();
+                        }
+                    });
+               dlgAlert.setCancelable(false);
+               dlgAlert.create().show();
+
+               return;
+            }
+
+            if (mWebView == null) {
+                Log.v(TAG, "mWebView is null");
+            } else {
+                Log.v(TAG, "mWebView is not null");
+            }
+
+            // Set up the webview
+            mWebView = new WebView(this);
+            mWebView.setId(mWebView.generateViewId());  // used to ensure the control persists
+            mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.getSettings().setDomStorageEnabled(true);
+            mWebView.setBackgroundColor(Color.BLACK);
+
+            mWebView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
+
+            mLayout = new AbsoluteLayout(this);
+            mLayout.addView(mWebView);
+
+            setContentView(mLayout);
+            // keep the loading screen up until
+            this.showLoadingScreen();
+
+            String mFilesDirectory = mActivity.getFilesDir().getAbsolutePath();
+            Log.v(TAG, "Setting env vars for start.c and Python to use");
+            PythonActivity.nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
+            PythonActivity.nativeSetEnv("ANDROID_ARGUMENT", mFilesDirectory);
+            PythonActivity.nativeSetEnv("ANDROID_APP_PATH", mFilesDirectory);
+            PythonActivity.nativeSetEnv("ANDROID_ENTRYPOINT", "main.pyo");
+            PythonActivity.nativeSetEnv("PYTHONHOME", mFilesDirectory);
+            PythonActivity.nativeSetEnv("PYTHONPATH", mFilesDirectory + ":" + mFilesDirectory + "/lib");
+
+            try {
+                Log.v(TAG, "Access to our meta-data...");
+                this.mMetaData = this.mActivity.getPackageManager().getApplicationInfo(
+                        this.mActivity.getPackageName(), PackageManager.GET_META_DATA).metaData;
+
+                PowerManager pm = (PowerManager) this.mActivity.getSystemService(Context.POWER_SERVICE);
+                if ( this.mMetaData.getInt("wakelock") == 1 ) {
+                    this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Screen On");
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+            }
+
+            final Thread pythonThread = new Thread(new PythonMain(), "PythonThread");
+            PythonActivity.mPythonThread = pythonThread;
+            pythonThread.start();
+        }
     }
 
     @Override

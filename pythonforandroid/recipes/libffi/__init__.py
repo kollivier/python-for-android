@@ -60,8 +60,7 @@ class LibffiRecipe(Recipe):
 
 			# shprint(sh.sed, '-i', 's/^dlname=.*$/dlname=\'libffi.so\'/', join(host, 'libffi.la'))
 
-			shprint(sh.cp, '-t', self.ctx.get_libs_dir(arch.arch),
-			        join(self.get_host(arch), '.libs', 'libffi.so')) #,
+			shprint(sh.cp, join(self.get_host(arch), '.libs', 'libffi.so'), self.ctx.get_libs_dir(arch.arch)) #,
 			        # join(host, 'libffi.la'))
 
 	def get_include_dirs(self, arch):
