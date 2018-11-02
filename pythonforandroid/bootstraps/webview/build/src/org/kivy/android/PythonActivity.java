@@ -92,7 +92,7 @@ public class PythonActivity extends Activity {
 
         this.mActivity = this;
         this.showLoadingScreen();
-        new UnpackFilesTask().execute(getFilesDir());
+        new UnpackFilesTask().execute(getFilesDir().getAbsolutePath());
     }
 
 
@@ -134,7 +134,7 @@ public class PythonActivity extends Activity {
 
             if (mBrokenLibraries)
             {
-                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(this);
+                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(PythonActivity.mActivity);
                 dlgAlert.setMessage("An error occurred while trying to load the application libraries. Please try again and/or reinstall."
                       + System.getProperty("line.separator")
                       + System.getProperty("line.separator")
@@ -161,7 +161,7 @@ public class PythonActivity extends Activity {
             }
 
             // Set up the webview
-            mWebView = new WebView(this);
+            mWebView = new WebView(PythonActivity.mActivity);
             mWebView.setId(mWebView.generateViewId());  // used to ensure the control persists
             mWebView.getSettings().setJavaScriptEnabled(true);
             mWebView.getSettings().setDomStorageEnabled(true);
@@ -169,14 +169,14 @@ public class PythonActivity extends Activity {
 
             mWebView.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
-            mLayout = new AbsoluteLayout(this);
+            mLayout = new AbsoluteLayout(PythonActivity.mActivity);
             mLayout.addView(mWebView);
 
             setContentView(mLayout);
             // keep the loading screen up until
-            this.showLoadingScreen();
+            PythonActivity.mActivity.showLoadingScreen();
 
-            String mFilesDirectory = mActivity.getFilesDir().getAbsolutePath();
+            String mFilesDirectory = PythonActivity.mActivity.getFilesDir().getAbsolutePath();
             Log.v(TAG, "Setting env vars for start.c and Python to use");
             PythonActivity.nativeSetEnv("ANDROID_PRIVATE", mFilesDirectory);
             PythonActivity.nativeSetEnv("ANDROID_ARGUMENT", mFilesDirectory);
@@ -187,12 +187,12 @@ public class PythonActivity extends Activity {
 
             try {
                 Log.v(TAG, "Access to our meta-data...");
-                this.mMetaData = this.mActivity.getPackageManager().getApplicationInfo(
-                        this.mActivity.getPackageName(), PackageManager.GET_META_DATA).metaData;
+                PythonActivity.mActivity.mMetaData = PythonActivity.mActivity.getPackageManager().getApplicationInfo(
+                        PythonActivity.mActivity.getPackageName(), PackageManager.GET_META_DATA).metaData;
 
-                PowerManager pm = (PowerManager) this.mActivity.getSystemService(Context.POWER_SERVICE);
-                if ( this.mMetaData.getInt("wakelock") == 1 ) {
-                    this.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Screen On");
+                PowerManager pm = (PowerManager) PythonActivity.mActivity.getSystemService(Context.POWER_SERVICE);
+                if ( PythonActivity.mActivity.mMetaData.getInt("wakelock") == 1 ) {
+                    PythonActivity.mActivity.mWakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "Screen On");
                 }
             } catch (PackageManager.NameNotFoundException e) {
             }
