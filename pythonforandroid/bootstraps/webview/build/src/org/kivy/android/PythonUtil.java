@@ -27,9 +27,11 @@ public class PythonUtil {
 
 		for (String lib : getLibraries()) {
 		    try {
+		        Log.v(TAG, "Loading " + lib);
                 System.loadLibrary(lib);
             } catch(UnsatisfiedLinkError e) {
                 if (lib.startsWith("python") && !skippedPython) {
+                    Log.v(TAG, "Error loading " + lib);
                     e.printStackTrace();
                     skippedPython = true;
                     continue;
