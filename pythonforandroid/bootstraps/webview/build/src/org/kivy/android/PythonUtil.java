@@ -30,6 +30,7 @@ public class PythonUtil {
                 System.loadLibrary(lib);
             } catch(UnsatisfiedLinkError e) {
                 if (lib.startsWith("python") && !skippedPython) {
+                    e.printStackTrace();
                     skippedPython = true;
                     continue;
                 }
