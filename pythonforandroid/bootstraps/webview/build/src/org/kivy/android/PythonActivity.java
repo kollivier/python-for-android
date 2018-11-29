@@ -60,6 +60,9 @@ public class PythonActivity extends Activity {
     // specifics.
 
     private static final String TAG = "PythonActivity";
+    private static final String URL_KEY = "SavedURL"
+
+    public static String mSavedURL = "";
 
     public static PythonActivity mActivity = null;
 
@@ -95,6 +98,20 @@ public class PythonActivity extends Activity {
         new UnpackFilesTask().execute(getFilesDir().getAbsolutePath());
     }
 
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        // We will use this once the app / web service is fully loaded to restore the state.
+        mSavedURL = savedInstanceState.getString(URL_KEY));
+    }
+
+    // invoked when the activity may be temporarily destroyed, save the instance state here
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putString(URL_KEY, mWebView.getUrl());
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
+    }
 
     private class UnpackFilesTask extends AsyncTask<String, Void, String> {
         @Override
