@@ -60,7 +60,7 @@ public class PythonActivity extends Activity {
     // specifics.
 
     private static final String TAG = "PythonActivity";
-    private static final String URL_KEY = "SavedURL"
+    private static final String URL_KEY = "SavedURL";
 
     public static String mSavedURL = "";
 
@@ -101,7 +101,7 @@ public class PythonActivity extends Activity {
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         // We will use this once the app / web service is fully loaded to restore the state.
-        mSavedURL = savedInstanceState.getString(URL_KEY));
+        mSavedURL = savedInstanceState.getString(URL_KEY);
     }
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
