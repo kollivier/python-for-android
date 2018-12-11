@@ -47,7 +47,7 @@ BLACKLIST_PATTERNS = [
     '*.swp',
 ]
 
-WHITELIST_PATTERNS = []
+WHITELIST_PATTERNS = ['pyconfig.h', ]
 
 python_files = []
 
