@@ -102,12 +102,14 @@ public class PythonActivity extends Activity {
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         // We will use this once the app / web service is fully loaded to restore the state.
         mSavedURL = savedInstanceState.getString(URL_KEY);
+        Log.v(TAG, "onRestoreIstanceState called, URL is: " + mSavedURL);
     }
 
     // invoked when the activity may be temporarily destroyed, save the instance state here
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putString(URL_KEY, mWebView.getUrl());
+        Log.v(TAG, "onSaveInstanceState called, URL is: " + mWebView.getUrl());
 
         // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);
