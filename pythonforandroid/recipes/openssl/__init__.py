@@ -6,7 +6,11 @@ import sh
 
 class OpenSSLRecipe(Recipe):
     version = '1.0.2p'
-    url = 'https://www.openssl.org/source/openssl-{version}.tar.gz'
+    
+    if version == "1.0.2p":
+        url = "https://www.openssl.org/source/old/1.0.2/openssl-1.0.2p.tar.gz"
+    else:
+        url = 'https://www.openssl.org/source/openssl-{version}.tar.gz'
 
     def should_build(self, arch):
         return not self.has_libs(arch, 'libssl' + self.version + '.so',
